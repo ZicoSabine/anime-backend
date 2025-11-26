@@ -258,7 +258,7 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-    return {"message": "Anime Recommendation API running"}
+    return {"status": "ok", "message": "Anime recommender backend is running"}
 
 
 # ================================
