@@ -12,6 +12,7 @@ import pandas as pd
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, field_validator
 from fastapi import Query
 
@@ -592,6 +593,14 @@ def submit_feedback(payload: FeedbackIn):
 
     return {"status": "ok", "message": "Thank you for your feedback!"}
 
-# TEMP_HEALTHCHECK_TEST
+@app.get("/api/feedback_download")
+def download_feedback():
+    if not FEEDBACK_PATH.exists():
+        raise HTTPException(404, "No feedback collected yet.")
 
-# TEMP_HEALTHCHECK_TEST
+    return FileResponse(
+        FEEDBACK_PATH,
+        media_type="text/csv",
+        filename="feedback.csv"
+    )
+
