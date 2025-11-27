@@ -404,7 +404,7 @@ def get_title_keys(meta: dict):
 # ================================
 
 @app.get("/api/recommend_by_item")
-def recommend_by_item(item_idx: int, top_k: int = 10):
+def recommend_by_item(item_idx: int, top_k: int = 10, include_same_series: bool = True,):
     """
     Recommend similar anime given an item_idx.
 
