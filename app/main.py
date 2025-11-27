@@ -106,7 +106,7 @@ if not CKPT_PATH.exists():
 ckpt = torch.load(CKPT_PATH, map_location=device, weights_only=False)
 
 n_users = ckpt["n_users"]
-n_s = ckpt["n_s"]
+n_items = ckpt["n_items"]
 gmf_dim = ckpt.get("gmf_dim", 32)
 mlp_layers = (64, 32, 16, 8)
 
