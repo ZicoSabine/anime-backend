@@ -106,7 +106,7 @@ if not CKPT_PATH.exists():
 ckpt = torch.load(CKPT_PATH, map_location=device, weights_only=False)
 
 n_users = ckpt["n_users"]
-n_items = ckpt["n_items"]
+n_s = ckpt["n_s"]
 gmf_dim = ckpt.get("gmf_dim", 32)
 mlp_layers = (64, 32, 16, 8)
 
@@ -455,13 +455,14 @@ def recommend_by_item(item_idx: int, top_k: int = 10):
 
         same_prefix = anchor_prefix and cand_prefix and (anchor_prefix == cand_prefix)
         same_head = anchor_head and cand_head and (anchor_head == cand_head)
-
-        # franchise bonus:
+        
+        # franchise bonus (only if toggle is ON)
         franchise_bonus = 0.0
-        if same_prefix:
-            franchise_bonus = 0.14
-        elif same_head:
-            franchise_bonus = 0.08
+        if include_same_series:
+            if same_prefix:
+                franchise_bonus = 0.14
+            elif same_head:
+                franchise_bonus = 0.08
 
         # ----- genre bonus -----
         cand_genres = {
@@ -497,7 +498,7 @@ def recommend_by_item(item_idx: int, top_k: int = 10):
     series_token = anchor_head or anchor_prefix
     series_token = series_token.lower().strip() if series_token else ""
 
-    if series_token:
+     if include_same_series and series_token:
         # current max score to place series items near the top
         max_final = max((r["final_score"] for r in recs), default=0.0)
         injected_bonus = max_final + 0.05  # put series items above others
@@ -547,7 +548,7 @@ def recommend_by_item(item_idx: int, top_k: int = 10):
 # ================================
 
 @app.get("/api/recommend_by_title")
-def recommend_by_title(query: str, top_k: int = 10):
+def recommend_by_title(query: str, top_k: int = 10, include_same_series: bool = True,):
     search = search_anime(query)
     results = search.get("results", [])
 
@@ -557,7 +558,11 @@ def recommend_by_title(query: str, top_k: int = 10):
     anchor = results[0]
     idx = int(anchor["item_idx"])
 
-    recs = recommend_by_item(idx, top_k)
+    recs = recommend_by_item(
+        idx,
+        top_k=top_k,
+        include_same_series=include_same_series,
+    )
 
     return {
         "query": query,
