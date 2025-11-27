@@ -248,9 +248,15 @@ class FeedbackIn(BaseModel):
 
 app = FastAPI(title="Anime Recommendation API")
 
+# CORS: allow your Netlify frontend + local dev
+origins = [
+    "https://idontknowwhatanimetowatchsorecommendmeone.netlify.app",  # <-- put your exact Netlify URL here
+    "http://localhost:5173",  # Vite dev server (optional but useful)
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
