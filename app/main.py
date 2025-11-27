@@ -497,8 +497,7 @@ def recommend_by_item(item_idx: int, top_k: int = 10):
     # use anchor_head as main series token (e.g. "bakugan", "naruto")
     series_token = anchor_head or anchor_prefix
     series_token = series_token.lower().strip() if series_token else ""
-
-     if include_same_series and series_token:
+    if include_same_series and series_token:
         # current max score to place series items near the top
         max_final = max((r["final_score"] for r in recs), default=0.0)
         injected_bonus = max_final + 0.05  # put series items above others
